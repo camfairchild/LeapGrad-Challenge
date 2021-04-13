@@ -1,0 +1,30 @@
+{
+  "name": "LeapGrad-Challenge",
+  "version": "1.0.0",
+  "description": "Interview challenge completed for LeapGrad for summer 2021",
+  "main": "index.js",
+  "repository": "https://github.com/camfairchild/LeapGrad-Challenge.git",
+  "author": "Cameron Fairchild <cameron@fairchild.dev>",
+  "license": "MIT",
+  "scripts": {
+		"start": "node server.js",
+		"test": "mocha --timeout 10000"
+	},
+	"dependencies": {
+		"dotenv": "^8.2.0",
+    "passport-http": "^0.3.0",
+    "bcrypt": "^5.0.1",
+		"express": "^4.17.1",
+		"mongoose": "^5.12.3",
+		"socket.io": "^4.0.1",
+		"yarn": "^1.22.10"
+	},
+  "devDependencies": {
+    "chai": "^4.3.4",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.3.2"
+  },
+	"engines": {
+		"node": "^15.11.0"
+	}
+}
