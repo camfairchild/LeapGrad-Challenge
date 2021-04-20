@@ -4,7 +4,7 @@ let express = require('express');
 const http = require('http');
 
 const server = http.createServer(app);
-const sio = require('socket.io')(server);
+const io = require('socket.io')(server);
 
 let api = require('./src/routes/api');
 let db = require('./src/db/db');
