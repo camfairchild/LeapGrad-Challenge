@@ -8,4 +8,4 @@ const StockSchema = new Schema(
     }
 );
 
-module.exports = mongoose.model('Stock', StockSchema);
+export default mongoose.model('Stock', StockSchema);

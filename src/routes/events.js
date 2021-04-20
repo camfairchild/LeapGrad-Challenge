@@ -1,6 +1,6 @@
-"use strict";
-require("dotenv").config();
+import dotenv from 'dotenv'
+dotenv.config();
 
-module.exports = function(socket, io) {
+export default function(socket, io) {
     
 }

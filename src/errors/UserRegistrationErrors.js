@@ -1,8 +1,3 @@
-class UserRegistrationError extends Error {};
+export class UserRegistrationError extends Error {};
 
-class UniqueUserError extends UserRegistrationError {};
-
-module.exports = {
-    UserRegistrationError,
-    UniqueUserError
-}
+export class UniqueUserError extends UserRegistrationError {};

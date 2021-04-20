@@ -1,3 +1,3 @@
-const Stock = require('../models/stock');
+import { Stock } from "../models/stock";
 
-function getStock(req, res)
+export function getStock(ticker) {}
