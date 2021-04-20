@@ -9,7 +9,7 @@
   "type": "module",
   "scripts": {
     "start": "node server.js",
-    "test": "mocha test/*.js --timeout 120000 --exit"
+    "test": "mocha test/*.js --timeout 60000 --exit"
   },
   "dependencies": {
     "bcrypt": "^5.0.1",
