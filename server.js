@@ -8,7 +8,7 @@ import sio from 'socket.io';
 const io = sio(server);
 
 import api from './src/routes/api';
-import db from './src/db/db';
+import { connect } from './src/db/db';
 
 import events from './src/routes/events';
 
@@ -16,7 +16,7 @@ let app = express();
 
 let port = process.env.PORT || 3000;
 
-let db_connection = db.connect();
+let db_connection = connect(process.env.MONGO_URI);
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
