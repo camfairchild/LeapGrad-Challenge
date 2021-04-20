@@ -24,7 +24,6 @@
     "chai": "^4.3.4",
     "chai-http": "^4.3.0",
     "mocha": "^8.3.2",
-    "mongodb-memory-server": "^6.9.6",
     "socket.io-client": "^4.0.1"
   },
   "engines": {
