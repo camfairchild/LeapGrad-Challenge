@@ -1,13 +1,16 @@
-"use strict";
-require('dotenv').config();
-let express = require('express');
-const http = require('http');
+import dotenv from 'dotenv'
+dotenv.config();
+import express from 'express';
+import http  from 'http';
 
 const server = http.createServer(app);
-const io = require('socket.io')(server);
+import sio from 'socket.io';
+const io = sio(server);
 
-let api = require('./src/routes/api');
-let db = require('./src/db/db');
+import api from './src/routes/api';
+import db from './src/db/db';
+
+import events from './src/routes/events';
 
 let app = express();
 
@@ -26,7 +29,7 @@ db_connection.on('error', console.error.bind(console, 'database connection error
 db_connection.once('open', () => {
     // On database connection
     io.sockets.on('connection', (socket) => {
-        require('./src/routes/events')(socket, io);
+        events(socket, io);
     });
     
     // catch 404
