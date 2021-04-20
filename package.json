@@ -8,7 +8,7 @@
   "license": "MIT",
   "scripts": {
 		"start": "node server.js",
-		"test": "mocha --timeout 10000"
+		"test": "NODE_ENV=test mocha test/*.js --exit"
 	},
 	"dependencies": {
 		"dotenv": "^8.2.0",
@@ -22,7 +22,8 @@
   "devDependencies": {
     "chai": "^4.3.4",
     "chai-http": "^4.3.0",
-    "mocha": "^8.3.2"
+    "mocha": "^8.3.2",
+    "socket.io-client": "^4.0.1"
   },
 	"engines": {
 		"node": "^15.11.0"
