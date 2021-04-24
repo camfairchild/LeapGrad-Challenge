@@ -1,6 +1,3 @@
-import dotenv from 'dotenv'
-dotenv.config();
-
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
@@ -18,27 +15,23 @@ export function connect(uri) {
     return mongoose.connection;
 }
 
-export function registerUser(username, password) {
+export async function registerUser(username, password) {
     var saltRounds = 10;
-    bcrypt.hash(password, saltRounds, function(err, hash) {
-        if (err) throw err;
-        // Store hash in your password DB.
-        const user = new User({
-            username: username,
-            password_hash: hash,
-            balance: 0,
-            portfolio: []
-        });
-
-        user.save((err) => {
-            if (err) {
-                if (err.name === 'MongoError' && err.code === 11000) {
-                    // Duplicate username error
-                    throw new UniqueUserError("This username is not unique!");
-                } else {
-                    throw err;
-                }
-            }
-        });
-    });
+    const hash = await bcrypt.hash(password, saltRounds);
+    const user = new User();
+    user.username = username;
+    user.password_hash = hash;
+    user.balance = 0.00;
+    user.portfolio = [];
+    try {
+        var doc = await user.save();
+        return doc;
+    } catch (err) {
+        if (err.name === 'MongoError' && err.code === 11000) {
+            // Duplicate username error
+            throw new UniqueUserError("This username is not unique!");
+        } else {
+            throw err;
+        }
+    }
 }
