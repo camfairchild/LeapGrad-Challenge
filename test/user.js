@@ -21,8 +21,12 @@ chai.should();
  */
 describe("user", () => {
     describe("user registration", () => {
+        before(async () => {
+            await User.collection.createIndex({ "username": 1 }, { unique: true });
+        });
+
         afterEach(async () => {
-            await User.collection.drop();
+            await User.collection.deleteMany();
         });
         // Test registration
         it("should register user in database", async() => {
@@ -37,9 +41,9 @@ describe("user", () => {
             // create user
             await registerUser("username", "password");
             // attempt to create a second user with same username
-            var user = await registerUser("username", "password");
-            console.log(user);
-            //await expect().to.be.rejectedWith(UniqueUserError);
+            registerUser("username", "password") // should error
+                .should.be.rejectedWith(UniqueUserError);
+            
             var num_users = await User.countDocuments({ "username": "username" });
             num_users.should.be.lessThan(2); // less than 2 should exist, i.e. 1
         });
