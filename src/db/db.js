@@ -35,3 +35,7 @@ export async function registerUser(username, password) {
         }
     }
 }
+
+export async function loginUser(username, password) {
+    return false;
+}
