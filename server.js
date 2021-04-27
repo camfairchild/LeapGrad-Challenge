@@ -15,10 +15,9 @@ import { Server as socketIO } from 'socket.io'
 const io = new socketIO(server);
 
 import api from './src/routes/api.js';
-import { connect, getUserByUsername, loginUser, registerUser } from './src/db/db.js';
+import { connect, getUserByUsername, registerUser, loginUser } from './src/db/db.js';
 
 import events from './src/routes/events.js';
-import { UserRegistrationError } from './src/errors/UserRegistrationErrors.js';
 
 let port = process.env.PORT || 3000;
 

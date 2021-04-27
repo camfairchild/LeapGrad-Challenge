@@ -1,8 +1,8 @@
 import mongoose from "mongoose";
-import bcrypt from "bcrypt";
 
 import User from "../models/user.js";
-import { UniqueUserError, UserRegistrationError } from "../errors/UserRegistrationErrors.js";
+import { createUser, checkLogin } from "../user.js";
+import { UniqueUserError } from "../errors/UserRegistrationErrors.js";
 
 export function connect(uri) {
     mongoose.connect(
@@ -16,13 +16,7 @@ export function connect(uri) {
 }
 
 export async function registerUser(username, password) {
-    var saltRounds = 10;
-    const hash = await bcrypt.hash(password, saltRounds);
-    const user = new User();
-    user.username = username;
-    user.password_hash = hash;
-    user.balance = 0.00;
-    user.portfolio = [];
+    let user = await createUser(username, password);
     try {
         var doc = await user.save();
         return doc;
@@ -34,19 +28,6 @@ export async function registerUser(username, password) {
             throw err;
         }
     }
-}
-
-export async function checkLogin(user, password, done) {
-    var hash = user.password_hash;
-    
-    bcrypt.compare(password, hash, (err, same) => {
-        if (err) done(err);
-        if (same) {
-            done(null, user);
-        } else {
-            done(null, false);
-        }
-    });
 }
 
 export function getUserByUsername(username, done) {
