@@ -37,7 +37,7 @@ router.post('/login',
                                 username: user.username
                             }
                             const token = jwt.sign({ user: body }, process.env.JWT_SECRET);
-                            return res.json({ token });
+                            return res.json({ token, message: "Login successful!" });
                         });
                 }
             } catch (err) {
