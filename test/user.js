@@ -16,7 +16,8 @@ import { server } from "../server.js";
 var db_connection;
 
 before(async () => {
-    db_connection = connect(process.env.MONGO_URI_test); // test db
+    db_connection = await connect(process.env.MONGO_URI_test); // test db
+    return db_connection;
 });
 
 chai.should();
@@ -26,95 +27,142 @@ chai.should();
 describe("user", () => {
 
     describe("user registration", () => {
-        before(async () => {
-            await User.collection.createIndex({ "username": 1 }, { unique: true });
-            await User.collection.deleteMany({});
+        before((done) => {
+            User.collection.createIndex({ "username": 1 }, { unique: true }).then(() => {
+                User.collection.deleteMany().then(() => {
+                    done();
+                });
+            }).catch((err) => {
+                done(err);
+            });
         });
-    
-        afterEach(async () => {
-            await User.collection.deleteMany({});
+        
+        afterEach((done) => {
+            User.collection.deleteMany().then(() => {
+                done();
+            }).catch((err) => {
+                done(err);
+            });
         });
+
         // Test registration
-        it("should register user in database", async() => {
-            await registerUser("username", "password");
-            // We should find a user with username in the database
-            var num_users = await User.countDocuments({ "username": "username" });
-            num_users.should.be.equal(1); // there should be 1 User with username in db
+        it("should register user in database", (done) => {
+            registerUser("username", "password").then((user) => {
+                // We should find a user with username in the database
+                User.countDocuments({ "username": "username" }, (err, count) => {
+                    expect(err).to.be.null;
+                    count.should.be.equal(1); // there should be 1 User with username in db
+                    done();
+                })
+            })
+            
         });
 
         // Test registration with empty username
-        it("should register user in database", async() => {
+        it("should prevent registering with empty username", (done) => {
             registerUser("", "password").should.be.rejectedWith(Error);
-            var num_users = await User.countDocuments({});
-            num_users.should.be.equal(0); // there should be no Users in db
+            User.countDocuments({}, (err, count) => {
+                expect(err).to.be.null;
+                count.should.be.equal(0); // there should be no Users in db
+                done();
+            });
         });
 
         // unique registration
-        it("should require username to be unique", async () => {
+        it("should require username to be unique", (done) => {
             // create user
-            await registerUser("username", "password");
-            // attempt to create a second user with same username
-            registerUser("username", "password") // should error
+            registerUser("username", "password").then(() => {
+                // attempt to create a second user with same username
+                registerUser("username", "password") // should error
                 .should.be.rejectedWith(UniqueUserError);
-            
-            var num_users = await User.countDocuments({ "username": "username" });
-            num_users.should.be.lessThan(2); // less than 2 should exist, i.e. 1
+                User.countDocuments({ "username": "username" }, (err, count) => {
+                    expect(err).to.be.null;
+                    count.should.be.lessThan(2); // less than 2 should exist, i.e. 1
+                    done();
+                });
+            });
         });
 
         // integration test for /api/register endpoint
-        it("should allow api registration", async () => {
+        it("should allow api registration", (done) => {
             // make post to register endpoint
             chai.request(server)
                 .post('/api/auth/register')
                 .send({
-                    username: "username",
+                    username: "test_user", // possible race between tests
                     password: "password"
                 })
                 .end((err, res) => {
                     expect(err).to.be.null;
                     res.should.have.status(200);
-                    res.should.have.property("user").not.null;
+                    res.body.should.have.property("user").not.null;
+                    done();
                 });
         });
     });
 
     describe("user login", () => {
-        before(async () => {
-            await User.collection.createIndex({ "username": 1 }, { unique: true });
-            await User.collection.deleteMany({});
+        before((done) => {
+            User.collection.createIndex({ "username": 1 }, { unique: true }).then(() => {
+                User.collection.deleteMany().then(() => {
+                    done();
+                }).catch((err) => {
+                    done(err);
+                });
+            }).catch((err) => {
+                done(err);
+            });
         });
-    
-        afterEach(async () => {
-            await User.collection.deleteMany({});
+        
+        afterEach((done) => {
+            User.collection.deleteMany().then(() => {
+                done();
+            }).catch((err) => {
+                done(err);
+            });
         });
 
         // Test check credentials
-        it("should be correct credentials for new user", async() => {
-            var user = await registerUser("username", "password"); // registers user
-            expect(user).to.not.be.null;
-            // check user login
-            checkLogin(user, "password", (err, user_) => {
-                expect(err).to.be.null;
-                user_.should.not.be.false;
+        it("should be correct credentials for new user", (done) => {
+            registerUser("username", "password").then((user) => {
+                expect(user).to.not.be.null;
+                // check user login
+                checkLogin(user, "password", (err, user_) => {
+                    expect(err).to.be.null;
+                    user_.should.not.be.false;
+                }).then(() => {
+                    done();
+                }).catch((err) => {
+                    done(err);
+                })
+            }).catch((err) => {
+                done(err);
             });
         });
 
         // Test user login
-        it("should login new user", async () => {
-            await registerUser("username", "password"); // registers user
-            // try login
-            loginUser("username", "password", (err, user) => {
-                expect(err).to.be.null;
-                user.should.have.property("username").equal("username");
+        it("should login new user", (done) => {
+            registerUser("username", "password").then(() => {
+                // try login
+                loginUser("username", "password", (err, user) => {
+                    expect(err).to.be.null;
+                    user.should.have.property("username").equal("username");
+                }).then(() => {
+                    done()
+                }).catch((err) => {
+                    done(err);
+                })
+            }).catch((err) => {
+                done(err)
             });
         });
 
         // Integration test of user login
-        it("should give valid session for login", async () => {
-            await registerUser("username", "password"); // registers user
-            // login user
-            // make post to login endpoint
-            chai.request(server)
+        it("should give valid session for login", (done) => {
+            registerUser("username", "password").then(() => {
+                // login user
+                // make post to login endpoint
+                chai.request(server)
                 .post('/api/auth/login')
                 .send({
                     username: "username",
@@ -123,8 +171,12 @@ describe("user", () => {
                 .end((err, res) => {
                     expect(err).to.be.null;
                     res.should.have.status(200);
-                    res.should.have.property("token");
+                    res.body.should.have.property("token").not.null;
+                    done();
                 });
+            }).catch((err) => {
+                done(err);
+            });
         });
     });
 });
