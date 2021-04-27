@@ -49,6 +49,8 @@ Either using yarn or npm
 
 ### Endpoints
 
+##### Note: to logout, the user can just forget the JWT token. Requesting a new token when logging in again.
+
 #### <span style="color:yellow">POST</span> /api/auth/register
 Body:  
     ```
@@ -99,6 +101,7 @@ Response:
     }
     ```
 
+<!---
 #### <span style="color:yellow">POST</span> /api/auth/logout
 Headers:  
     ```
@@ -124,6 +127,7 @@ Response:
     ```
     Unauthorized
     ```
+--->
 
 #### <span style="color:#30c821">GET</span> /api/account/balance
 Headers:  
