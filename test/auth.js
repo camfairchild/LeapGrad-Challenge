@@ -43,6 +43,7 @@ describe("auth api endpoints", () => {
                 done(err);
             });
         });
+
         // integration test for /api/register endpoint
         it("should allow api registration", (done) => {
             // make post to register endpoint
@@ -61,6 +62,30 @@ describe("auth api endpoints", () => {
                         user.should.have.property("username").eql("test_user");
                     });
                     done();
+                });
+        });
+
+        it("should disallow non-unique registration", (done) => {
+            // make post to register endpoint
+            chai.request(server)
+                .post('/api/auth/register')
+                .send({
+                    username: "username", // possible race between tests
+                    password: "password"
+                })
+                .then((res) => {
+                    res.should.have.status(200);
+                    chai.request(server)
+                        .post('/api/auth/register')
+                        .send({
+                            username: "username", // possible race between tests
+                            password: "password"
+                        })
+                        .end((err, res) => {
+                            res.should.have.status(500);
+                            res.body.should.have.property("error").not.null;
+                            done();
+                        });
                 });
         });
     });
