@@ -50,23 +50,34 @@ describe("account api endpoints", () => {
         it("should get user balance", (done) => {
             registerUser("username", "password").then(() => {
                 // login user
-                // make post to balance endpoint
                 chai.request(server)
-                .post('/api/account/balance')
+                .post('/api/auth/login')
                 .send({
-                    amount: 10.00
+                    username: "username",
+                    password: "password"
                 })
-                .auth("username", "password")
-                .end((err, res) => {
-                    expect(err).to.be.null;
-                    res.should.have.status(200);
-                    getBalance("username", (err, balance) => {
-                        expect(err).to.be.null;
-                        balance.should.eql(10.00);
+                .then((res) => {
+                    // set jwt token
+                    var token = res.body.token;
+                    // make post to balance endpoint
+                    chai.request(server)
+                    .post('/api/account/balance')
+                    .set({ "Authorization": `Bearer ${token}`})
+                    .send({
+                        amount: 10.00
                     })
-                    done();
+                    .end((err, res) => {
+                        expect(err).to.be.null;
+                        res.should.have.status(200);
+                        getBalance("username", (err, balance) => {
+                            expect(err).to.be.null;
+                            balance.should.eql(10.00);
+                        })
+                        done();
+                    });
+                }).catch((err) => {
+                    done(err);
                 });
-                
             }).catch((err) => {
                 done(err);
             });
@@ -75,21 +86,33 @@ describe("account api endpoints", () => {
         // Integration test of user get balance
         it("should get user balance", (done) => {
             registerUser("username", "password").then(() => {
-                // set user balance
-                updateBalance("username", 10.00, (err) => {
-                    // login user
-                    // make get to balance endpoint
-                    chai.request(server)
-                    .get('/api/account/balance')
-                    .auth("username", "password")
-                    .end((err, res) => {
-                        expect(err).to.be.null;
-                        res.should.have.status(200);
-                        res.body.should.have.property("balance").eql(10.00);
-                        done();
-                    });
+                // login user
+                chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "username",
+                    password: "password"
                 })
-                
+                .then((res) => {
+                    // get jwt token
+                    var token = res.body.token;
+                    // set user balance
+                    updateBalance("username", 10.00, (err) => {
+                        expect(err).to.be.null;
+                        // make get to balance endpoint
+                        chai.request(server)
+                        .get('/api/account/balance')
+                        .set({ "Authorization": `Bearer ${token}`})
+                        .end((err, res) => {
+                            expect(err).to.be.null;
+                            res.should.have.status(200);
+                            res.body.should.have.property("balance").eql(10.00);
+                            done();
+                        });
+                    })
+                }).catch((err) => {
+                    done(err);
+                });
             }).catch((err) => {
                 done(err);
             });
