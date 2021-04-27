@@ -47,7 +47,7 @@ describe("account api endpoints", () => {
         });
 
         // Integration test of user update balance
-        it("should get user balance", (done) => {
+        it("should set user balance", (done) => {
             registerUser("username", "password").then(() => {
                 // login user
                 chai.request(server)
@@ -73,6 +73,39 @@ describe("account api endpoints", () => {
                             expect(err).to.be.null;
                             balance.should.eql(10.00);
                         })
+                        done();
+                    });
+                }).catch((err) => {
+                    done(err);
+                });
+            }).catch((err) => {
+                done(err);
+            });
+        });
+
+        it("should disallow non-numeric balance update input", (done) => {
+            registerUser("username", "password").then(() => {
+                // login user
+                chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "username",
+                    password: "password"
+                })
+                .then((res) => {
+                    // set jwt token
+                    var token = res.body.token;
+                    // make post to balance endpoint
+                    chai.request(server)
+                    .post('/api/account/balance')
+                    .set({ "Authorization": `Bearer ${token}`})
+                    .send({
+                        amount: "invalid input"
+                    })
+                    .end((err, res) => {
+                        expect(err).to.be.null;
+                        res.should.have.status(422);
+                        res.body.should.have.property("error").equal("Invalid amount");
                         done();
                     });
                 }).catch((err) => {
