@@ -34,12 +34,46 @@ app.use(express.urlencoded({ extended: false }));
 app.use(passport.initialize());
 app.use('/api', api);
 
-passport.use(new BasicStrategy (
-    loginUser
+passport.use('register', new Strategy ({
+      usernameField: 'username',
+      passwordField: 'password'
+    },
+    (username, password, done) => {
+        registerUser(username, password).then((user) => {
+            done(null, user);
+        }).catch((err) => {
+            done(err);
+        });
+    }
+));
+
+passport.use('login', new Strategy ({
+    usernameField: 'username',
+    passwordField: 'password'
+  },
+  (username, password, done) => {
+      loginUser(username, password, (err, user) => {
+          done(err, user);
+      });
+  }
+));
+
+passport.use(new JWTstrategy(
+    {
+        secretOrKey: process.env.JWT_SECRET,
+        jwtFromRequest: ExtractJwt.fromUrlQueryParameter("token")
+    },
+    async (token, done) => {
+        try {
+            done(null, token.user);
+        } catch (err) {
+            done(err);
+        }
+    }
 ))
 
-passport.deserializeUser((user, done) => {
-    getUserByUsername(user.username, done);
+passport.deserializeUser((username, done) => {
+    getUserByUsername(username, done);
 });
 
 passport.serializeUser((user, done) => {

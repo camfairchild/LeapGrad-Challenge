@@ -36,6 +36,42 @@ export async function registerUser(username, password) {
     }
 }
 
-export async function loginUser(username, password) {
-    return false;
+export async function checkLogin(user, password, done) {
+    var hash = user.password_hash;
+    
+    bcrypt.compare(password, hash, (err, same) => {
+        if (err) done(err);
+        if (same) {
+            done(null, user);
+        } else {
+            done(null, false);
+        }
+    });
+}
+
+export function getUserByUsername(username, done) {
+    User.findOne({ "username": username }, (err, doc) => {
+        if (err) {
+            done(err);
+        } else {
+            done(null, doc);
+        }
+    })
+}
+
+export async function loginUser(username, password, done) {
+    getUserByUsername(username, (err, user) => {
+        if (err) {
+            // Error
+            done(err);
+        } else {
+            if (!user) {
+                // User does not exist
+                done(null, false);
+            } else {
+                // try to login
+                checkLogin(user, password, done);
+            }
+        }
+    });
 }
