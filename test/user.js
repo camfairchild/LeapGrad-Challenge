@@ -1,13 +1,17 @@
 import dotenv from 'dotenv'
 dotenv.config();
 
-import chai, { expect } from "chai";
+import chai, { expect, should } from "chai";
 import chai_as_promised from "chai-as-promised";
-chai.use(chai_as_promised);
+import chaiHttp from "chai-http";
 
-import { connect, registerUser, loginUser } from "../src/db/db.js";
+chai.use(chai_as_promised);
+chai.use(chaiHttp);
+
+import { connect, loginUser, registerUser, checkLogin } from "../src/db/db.js";
 import User from "../src/models/user.js";
 import { UniqueUserError } from "../src/errors/UserRegistrationErrors.js";
+import { server } from "../server.js";
 
 var db_connection;
 
@@ -58,7 +62,7 @@ describe("user", () => {
         });
     });
 
-    describe("user login", () => {
+    describe("user login", () => { 2
         before(async () => {
             await User.collection.createIndex({ "username": 1 }, { unique: true });
             await User.collection.deleteMany({});
@@ -67,12 +71,47 @@ describe("user", () => {
         afterEach(async () => {
             await User.collection.deleteMany({});
         });
-        // Test registration
-        it("should login user", async() => {
+
+        // Test check credentials
+        it("should be correct credentials for new user", async() => {
+            var user = await registerUser("username", "password"); // registers user
+            expect(user).to.not.be.null;
+            // check user login
+            checkLogin(user, "password", (err, result) => {
+                expect(err).to.be.null;
+                result.should.be.true;
+            });
+        });
+
+        // Test user login
+        it("should login new user", async () => {
             await registerUser("username", "password"); // registers user
-            // try to login user
-            var result = await loginUser("username", "password");
-            result.should.be.true();
+            // try login
+            loginUser("username", "password", (err, user) => {
+                expect(err).to.be.null;
+                user.should.have.username.equal("username");
+            });
+        });
+
+        // Integration test of user login
+        it("should give valid session for login", async (done) => {
+            await registerUser("username", "password"); // registers user
+            // login user
+            // make get to login endpoint
+            // TODO: use agent to save cookies
+            chai.request(server)
+                .post('/api/login')
+                .type('form')
+                .send({
+                    username: "username",
+                    password: "password"
+                })
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    res.should.have.status(200);
+                    // TODO: check token valid
+                    done();
+                });
         });
     });
 });
