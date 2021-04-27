@@ -56,3 +56,20 @@ export async function loginUser(username, password, done) {
         }
     });
 }
+
+export function updateBalance(username, amount, done) {
+    getUserByUsername(username, (err, user) => {
+        if (err) done(err);
+        user.balance += amount;
+        user.save((err, doc) => {
+            done(err);
+        })
+    })
+}
+
+export function getBalance(username, done) {
+    getUserByUsername(username, (err, user) => {
+        if (err) throw err;
+        done(null, user.balance);
+    });
+}
