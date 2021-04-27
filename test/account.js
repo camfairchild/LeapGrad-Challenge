@@ -50,11 +50,11 @@ describe("account api endpoints", () => {
         it("should get user balance", (done) => {
             registerUser("username", "password").then(() => {
                 // login user
-                // make put to balance endpoint
+                // make post to balance endpoint
                 chai.request(server)
-                .put('/api/account/balance')
+                .post('/api/account/balance')
                 .send({
-                    amount: 10
+                    amount: 10.00
                 })
                 .auth("username", "password")
                 .end((err, res) => {
@@ -62,7 +62,7 @@ describe("account api endpoints", () => {
                     res.should.have.status(200);
                     getBalance("username", (err, balance) => {
                         expect(err).to.be.null;
-                        balance.should.eql(10);
+                        balance.should.eql(10.00);
                     })
                     done();
                 });
@@ -76,7 +76,7 @@ describe("account api endpoints", () => {
         it("should get user balance", (done) => {
             registerUser("username", "password").then(() => {
                 // set user balance
-                updateBalance("username", 10, (err) => {
+                updateBalance("username", 10.00, (err) => {
                     // login user
                     // make get to balance endpoint
                     chai.request(server)
@@ -85,7 +85,7 @@ describe("account api endpoints", () => {
                     .end((err, res) => {
                         expect(err).to.be.null;
                         res.should.have.status(200);
-                        res.body.should.have.property("balance").eql(10);
+                        res.body.should.have.property("balance").eql(10.00);
                         done();
                     });
                 })
