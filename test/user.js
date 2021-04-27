@@ -60,9 +60,25 @@ describe("user", () => {
             var num_users = await User.countDocuments({ "username": "username" });
             num_users.should.be.lessThan(2); // less than 2 should exist, i.e. 1
         });
+
+        // integration test for /api/register endpoint
+        it("should allow api registration", async () => {
+            // make post to register endpoint
+            chai.request(server)
+                .post('/api/register')
+                .send({
+                    username: "username",
+                    password: "password"
+                })
+                .end((err, res) => {
+                    expect(err).to.be.null;
+                    res.should.have.status(200);
+                    res.should.have.property("user").not.null;
+                });
+        });
     });
 
-    describe("user login", () => { 2
+    describe("user login", () => {
         before(async () => {
             await User.collection.createIndex({ "username": 1 }, { unique: true });
             await User.collection.deleteMany({});
@@ -77,9 +93,9 @@ describe("user", () => {
             var user = await registerUser("username", "password"); // registers user
             expect(user).to.not.be.null;
             // check user login
-            checkLogin(user, "password", (err, result) => {
+            checkLogin(user, "password", (err, user_) => {
                 expect(err).to.be.null;
-                result.should.be.true;
+                user_.should.not.be.false;
             });
         });
 
@@ -89,19 +105,17 @@ describe("user", () => {
             // try login
             loginUser("username", "password", (err, user) => {
                 expect(err).to.be.null;
-                user.should.have.username.equal("username");
+                user.should.have.property("username").equal("username");
             });
         });
 
         // Integration test of user login
-        it("should give valid session for login", async (done) => {
+        it("should give valid session for login", async () => {
             await registerUser("username", "password"); // registers user
             // login user
-            // make get to login endpoint
-            // TODO: use agent to save cookies
+            // make post to login endpoint
             chai.request(server)
                 .post('/api/login')
-                .type('form')
                 .send({
                     username: "username",
                     password: "password"
@@ -109,8 +123,7 @@ describe("user", () => {
                 .end((err, res) => {
                     expect(err).to.be.null;
                     res.should.have.status(200);
-                    // TODO: check token valid
-                    done();
+                    res.should.have.property("token");
                 });
         });
     });
