@@ -2,39 +2,36 @@ import dotenv from 'dotenv'
 dotenv.config();
 import express from 'express';
 import http  from 'http';
-import session from "express-session";
-import bodyParser from "body-parser";
 
 let app = express();
 
 import passport from 'passport';
-import { BasicStrategy } from 'passport-http';
+import { Strategy } from 'passport-local';
 
-
+import { Strategy as JWTstrategy, ExtractJwt } from 'passport-jwt';
 
 export var server = http.createServer(app);
 import { Server as socketIO } from 'socket.io'
 const io = new socketIO(server);
 
 import api from './src/routes/api.js';
-import { connect, getUserByUsername, loginUser } from './src/db/db.js';
+import { connect, getUserByUsername, loginUser, registerUser } from './src/db/db.js';
 
 import events from './src/routes/events.js';
 import { UserRegistrationError } from './src/errors/UserRegistrationErrors.js';
 
 let port = process.env.PORT || 3000;
 
-let db_connection = connect(process.env.MONGO_URI);
+let db_connection;
+if (process.env.NODE_ENV === "test") {
+    db_connection = connect(process.env.MONGO_URI_test);
+} else {
+    db_connection = connect(process.env.MONGO_URI_prod);
+}
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(session({
-    secret: process.env.SESSION_SECRET,
-    resave: false,
-    saveUninitialized: true
-  }))
 app.use(passport.initialize());
-app.use(passport.session());
 app.use('/api', api);
 
 passport.use(new BasicStrategy (
