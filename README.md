@@ -3,8 +3,8 @@
 Build a stock market tracking system.
 ### Section 1
 Your system should have
-- [ ] support for users to login/logout.
-- [ ] Users should be able to add balance to their wallet.
+- [ x ] support for users to login/logout.
+- [ x ] Users should be able to add balance to their wallet.
 - [ ] Users should be able to buy/sell shares (transactions need not be stored)
 - [ ] Users should be able to subscribe to an endpoint that should provide live rates.
 - [ ] Users should have the ability to see their portfolio
@@ -44,3 +44,117 @@ Either using yarn or npm
     yarn install
 
 ### Run
+
+    yarn run start
+
+### Endpoints
+
+#### <span style="color:yellow">POST</span> /api/auth/register
+Body:  
+    ```
+    {
+        "username": <username>,
+        "password": <password>
+    }
+    ```
+
+Response:  
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        "message": "Registration successful!",
+        "user": <user Object>
+    }
+    ```
+
+<span style="color:red">422</span>  
+    ```
+    {
+        "message": "Registration successful!"
+    }
+    ```
+
+#### <span style="color:yellow">POST</span> /api/auth/login
+Body:  
+    ```
+    {
+        "username": <username>,
+        "password": <password>
+    }
+    ```
+
+Response:  
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        "message": "Login successful!",
+        "token": <bearer token string>
+    }
+    ```
+
+<span style="color:red">401</span>  
+    ```
+    {
+        "error": "Incorrect credentials"
+    }
+    ```
+
+#### <span style="color:#30c821">GET</span> /api/account/balance
+Headers:  
+    ```
+    {
+        Authorization: "Bearer {{jwt_token}}
+    }
+    ```
+
+Parameters:  
+    ```
+    {}
+    ```
+
+Response:  
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        "balance": <account balance>
+    }
+    ```
+
+<span style="color:red">401</span>  
+    ```
+    {
+        "error": "Unauthorized"
+    }
+    ```
+
+#### <span style="color:yellow">POST</span> /api/account/balance
+Headers:  
+    ```
+    {
+        Authorization: "Bearer {{jwt_token}}
+    }
+    ```
+
+Body:  
+    ```
+    {
+        "amount": <numeric increase to balance>
+    }
+    ```
+
+Response:  
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        "balance": <account balance>
+    }
+    ```
+
+<span style="color:red">401</span>  
+    ```
+    Unauthorized
+    ```
+
+### Test
+
+    yarn run test
