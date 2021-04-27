@@ -82,7 +82,7 @@ describe("auth api endpoints", () => {
                             password: "password"
                         })
                         .end((err, res) => {
-                            res.should.have.status(500);
+                            res.should.have.status(422);
                             res.body.should.have.property("error").not.null;
                             done();
                         });
@@ -130,6 +130,20 @@ describe("auth api endpoints", () => {
                 });
             }).catch((err) => {
                 done(err);
+            });
+        });
+
+        it("should fail to authenticate with wrong credentials", (done) => {
+            // make post to login endpoint
+            chai.request(server)
+            .post('/api/auth/login')
+            .send({
+                username: "username",
+                password: "password"
+            })
+            .end((err, res) => {
+                res.should.have.status(401);
+                done();
             });
         });
     });
