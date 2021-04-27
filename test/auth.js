@@ -149,4 +149,128 @@ describe("auth api endpoints", () => {
             });
         });
     });
+
+    /* Note: Can't invalidate an issued JWT token
+        Logout should be client-side instead
+    describe("user logout", () => {
+        before((done) => {
+            User.collection.createIndex({ "username": 1 }, { unique: true }).then(() => {
+                User.collection.deleteMany().then(() => {
+                    done();
+                }).catch((err) => {
+                    done(err);
+                });
+            }).catch((err) => {
+                done(err);
+            });
+        });
+        
+        afterEach((done) => {
+            User.collection.deleteMany().then(() => {
+                done();
+            }).catch((err) => {
+                done(err);
+            });
+        });
+
+        // Integration test of user logout
+        it("should allow user logout", (done) => {
+            registerUser("test_user", "password").then(() => {
+                // login user
+                // make post to login endpoint
+                chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "test_user",
+                    password: "password"
+                })
+                .then((res) => {
+                    // logged in
+                    res.should.have.status(200);
+                    res.body.should.have.property("token").not.null;
+                    
+                    var token = res.body.token;
+                    chai.request(server)
+                    .post('/api/auth/logout')
+                    .set({ "Authorization": `Bearer ${token}`})
+                    .send()
+                    .then((res) => {
+                        expect(err).to.be.null;
+                        res.should.have.status(200);
+                        res.body.should.have.property("message").eql("Logout successful!");
+                        // logged out
+                        //test protected endpoint
+                        chai.request(server)
+                        .post('/api/account/balance')
+                        .set({ "Authorization": `Bearer ${token}`})
+                        .send({
+                            amount: 10.00
+                        })
+                        .end((err, res) => {
+                            expect(err).to.be.null;
+                            res.should.have.status(401); // unauthorized
+                            done();
+                        }).catch((err) => {
+                            done(err);
+                        });
+                    }).catch((err) => {
+                        done(err);
+                    });
+                }).catch((err) => {
+                    done(err);
+                });
+            }).catch((err) => {
+                done(err);
+            });
+        });
+
+        it("should fail to authenticate with wrong token", (done) => {
+            registerUser("username", "password").then(() => {
+                // login user
+                // make post to login endpoint
+                chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "username",
+                    password: "password"
+                })
+                .then((res) => {
+                    // logged in
+                    res.should.have.status(200);
+                    res.body.should.have.property("token").not.null;
+                    
+                    var token = res.body.token;
+                    chai.request(server)
+                    .post('/api/auth/logout')
+                    .set({ "Authorization": `Bearer invalidToken`})
+                    .send({})
+                    .then((res) => {
+                        expect(err).to.be.null;
+                        res.should.have.status(401); // unauthorized
+                        // unsuccessful log out
+                        //test protected endpoint
+                        chai.request(server)
+                        .post('/api/account/balance')
+                        .set({ "Authorization": `Bearer ${token}`})
+                        .send({
+                            amount: 10.00
+                        })
+                        .end((err, res) => {
+                            expect(err).to.be.null;
+                            res.should.have.status(200); // authorized
+                            done();
+                        }).catch((err) => {
+                            done(err);
+                        });
+                    }).catch((err) => {
+                        done(err);
+                    });
+                }).catch((err) => {
+                    done(err);
+                });
+            }).catch((err) => {
+                done(err);
+            });
+        });
+    });*/
 });
