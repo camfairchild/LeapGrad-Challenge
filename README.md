@@ -70,7 +70,7 @@ Response:
 <span style="color:red">422</span>  
     ```
     {
-        "message": "Registration successful!"
+        "message": "Registration unsuccessful"
     }
     ```
 
@@ -99,6 +99,32 @@ Response:
     }
     ```
 
+#### <span style="color:yellow">POST</span> /api/auth/logout
+Headers:  
+    ```
+    {
+        Authorization: "Bearer {{jwt_token}}
+    }
+    ```
+
+Body:  
+    ```
+    {}
+    ```
+
+Response:  
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        "message": "Logout successful!"
+    }
+    ```
+
+<span style="color:red">401</span>  
+    ```
+    Unauthorized
+    ```
+
 #### <span style="color:#30c821">GET</span> /api/account/balance
 Headers:  
     ```
@@ -122,9 +148,7 @@ Response:
 
 <span style="color:red">401</span>  
     ```
-    {
-        "error": "Unauthorized"
-    }
+    Unauthorized
     ```
 
 #### <span style="color:yellow">POST</span> /api/account/balance
