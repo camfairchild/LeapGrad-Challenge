@@ -23,7 +23,7 @@ chai.should();
 
 /** Test
  */
-describe("atuh api endpoints", () => {
+describe("auth api endpoints", () => {
 
     describe("user registration", () => {
         before((done) => {
