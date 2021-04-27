@@ -62,7 +62,8 @@ export function updateBalance(username, amount, done) {
         if (err) done(err);
         user.balance += amount;
         user.save((err, doc) => {
-            done(err);
+            if (err) done(err);
+            done(err, doc.balance);
         })
     })
 }
