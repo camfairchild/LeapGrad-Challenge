@@ -126,6 +126,7 @@ describe("auth api endpoints", () => {
                     expect(err).to.be.null;
                     res.should.have.status(200);
                     res.body.should.have.property("token").not.null;
+                    res.body.should.have.property("message").eql("Login successful!");
                     done();
                 });
             }).catch((err) => {
@@ -143,6 +144,7 @@ describe("auth api endpoints", () => {
             })
             .end((err, res) => {
                 res.should.have.status(401);
+                res.body.should.have.property("error").eql("Incorrect credentials")
                 done();
             });
         });
