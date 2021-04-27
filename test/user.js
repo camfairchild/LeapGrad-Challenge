@@ -65,7 +65,7 @@ describe("user", () => {
         it("should allow api registration", async () => {
             // make post to register endpoint
             chai.request(server)
-                .post('/api/register')
+                .post('/api/auth/register')
                 .send({
                     username: "username",
                     password: "password"
@@ -115,7 +115,7 @@ describe("user", () => {
             // login user
             // make post to login endpoint
             chai.request(server)
-                .post('/api/login')
+                .post('/api/auth/login')
                 .send({
                     username: "username",
                     password: "password"
