@@ -38,10 +38,8 @@ describe("user", () => {
             let username = "username";
             let password = "password";
             var user = await createUser(username, password);
-            checkLogin(user, password, (err, user_) => {
-                expect(err).to.be.null;
-                user_.username.should.be.equal(username);
-            });
+            let result = await checkLogin(user, password);
+            result.should.be.true;
         });
     });
 });

@@ -60,8 +60,8 @@ describe("auth api endpoints", () => {
                     loginUser("test_user", "password", (err, user) => {
                         expect(err).to.be.null;
                         user.should.have.property("username").eql("test_user");
+                        done();
                     });
-                    done();
                 });
         });
 
