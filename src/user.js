@@ -20,6 +20,6 @@ export async function createUser(username, password) {
     user.username = username;
     user.password_hash = hash;
     user.balance = 0.00;
-    user.portfolio = [];
+    user.portfolio = new Map();
     return user;
 }
