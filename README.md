@@ -228,7 +228,7 @@ Body:
     ```
 
 Response:  
-With enough balance:
+##### With enough balance:
 <span style="color:#30c821">200</span>  
     ```
     {
@@ -242,7 +242,8 @@ With enough balance:
         amount: Number
     }
     ```
-User Error
+
+##### User Error
 <span style="color:#30c821">200</span>  
     ```
     {
@@ -250,7 +251,7 @@ User Error
     }
     ```
 
-Server Error
+##### Server Error
 <span style="color:red">500</span>  
     ```
     {
@@ -280,7 +281,7 @@ Body:
     ```
 
 Response:  
-With enough shares:
+##### With enough shares:
 <span style="color:#30c821">200</span>  
     ```
     {
@@ -294,7 +295,8 @@ With enough shares:
         amount: Number
     }
     ```
-User Error
+
+##### User Error
 <span style="color:#30c821">200</span>  
     ```
     {
@@ -302,7 +304,7 @@ User Error
     }
     ```
 
-Server Error
+##### Server Error
 <span style="color:red">500</span>  
     ```
     {
