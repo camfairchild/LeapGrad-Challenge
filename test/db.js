@@ -21,7 +21,7 @@ chai.should();
 
 /** Test
  */
-/*describe("db: user", () => {
+describe("db: user", () => {
 
     describe("user functions", () => {
         before((done) => {
@@ -81,7 +81,7 @@ chai.should();
         it("should register user in database", async () => {
             await registerUser("test_user", "password");
             // We should find a user with username in the database
-            let count = await User.countDocuments({ "username": "username" });
+            let count = await User.countDocuments({ "username": "test_user" });
             count.should.be.equal(1); // there should be 1 User with username in db
         });
 
@@ -93,7 +93,7 @@ chai.should();
         });
 
         // unique registration
-        it("should require username to be unique", (done) => {
+        it("should require username to be unique", async () => {
             // create user
             await registerUser("username", "password");
             // attempt to create a second user with same username
@@ -103,4 +103,4 @@ chai.should();
             count.should.be.lessThan(2); // less than 2 should exist, i.e. 1
         });
     });
-});*/
+});
