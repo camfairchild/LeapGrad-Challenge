@@ -5,7 +5,7 @@ import Stock from "../models/stock.js";
 import { createUser, checkLogin } from "../user.js";
 import { addStock, removeStock, getPortfolio } from "../stock.js";
 import { UniqueUserError } from "../errors/UserRegistrationErrors.js";
-import { OutOfStockError, NonWholeStockQuantityError, OutOfFundsError, StockError, TickerDoesNotExistError } from "../errors/StockErrors.js";
+import { OutOfFundsError, TickerDoesNotExistError } from "../errors/StockErrors.js";
 
 export function connect(uri) {
     mongoose.connect(
