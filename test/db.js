@@ -7,7 +7,7 @@ import chai_as_promised from "chai-as-promised";
 chai.use(chai_as_promised);
 
 import { connect, getUserByUsername, registerUser, updateBalanceByUsername, getBalanceByUsername, getPortfolioByUsername, buyStock, sellStock, getStockByTicker } from "../src/db/db.js";
-import { OutOfStockError, NonWholeStockQuantityError, OutOfFundsError } from "../src/errors/StockErrors.js";
+import { OutOfStockError, NonWholeStockQuantityError, OutOfFundsError, TickerDoesNotExistError } from "../src/errors/StockErrors.js";
 import User from "../src/models/user.js";
 import Stock from "../src/models/stock.js";
 import { UniqueUserError } from "../src/errors/UserRegistrationErrors.js";
@@ -271,12 +271,16 @@ describe("db: user", () => {
             });
         });
 
-
         it("should get stock from ticker", async () => {
             var t = await getStockByTicker("TEST");
             t.should.have.property("company").eql("test");
             var f = await getStockByTicker("FREE");
             f.should.have.property("company").eql("free");
+        });
+
+        it("should not get invalid ticker", async () => {
+            getStockByTicker("FAKE").should.be.rejectedWith(TickerDoesNotExistError);
+            getStockByTicker("").should.be.rejectedWith(TickerDoesNotExistError);
         });
     });
 });
