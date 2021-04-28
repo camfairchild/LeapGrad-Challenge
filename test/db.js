@@ -6,7 +6,7 @@ import chai_as_promised from "chai-as-promised";
 
 chai.use(chai_as_promised);
 
-import { connect, getUserByUsername, registerUser, updateBalance, getBalance, getPortfolioByUsername, buyStock, sellStock } from "../src/db/db.js";
+import { connect, getUserByUsername, registerUser, updateBalance, getBalance, getPortfolioByUsername, buyStock, sellStock, getStockByTicker } from "../src/db/db.js";
 import { OutOfStockError, NonWholeStockQuantityError, OutOfFundsError } from "../src/errors/StockErrors.js";
 import User from "../src/models/user.js";
 import Stock from "../src/models/stock.js";
@@ -146,7 +146,7 @@ describe("db: user", () => {
             });
         });
 
-        // Integration test of user get portfolio
+        // unit test of user get portfolio
         it("should get user portfolio", async () => {
             await registerUser("username", "password");
 
@@ -244,6 +244,39 @@ describe("db: user", () => {
             pf.has("TEST").should.be.false; // couldn't buy
             var balance = await getBalance("username");
             balance.should.be.eql(1.00); // balance unchanged
+        });
+    });
+
+    describe("stock", () => {
+        before((done) => {
+           Stock.collection.deleteMany().then(async () => {
+                var t = new Stock({
+                    company: "test",
+                    ticker: "TEST",
+                    price: 2.00
+                });
+                
+                await t.save();
+
+                var f = new Stock({
+                    company: "free",
+                    ticker: "FREE",
+                    price: 0.00
+                });
+
+                await f.save();
+                done();
+            }).catch((err) => {
+                done(err);
+            });
+        });
+
+
+        it("should get stock from ticker", async () => {
+            var t = await getStockByTicker("TEST");
+            t.should.have.property("company").eql("test");
+            var f = await getStockByTicker("FREE");
+            f.should.have.property("company").eql("free");
         });
     });
 });
