@@ -5,9 +5,9 @@ Build a stock market tracking system.
 Your system should have
 - [ x ] support for users to login/logout.
 - [ x ] Users should be able to add balance to their wallet.
-- [ ] Users should be able to buy/sell shares (transactions need not be stored)
+- [ x ] Users should be able to buy/sell shares (transactions need not be stored)
 - [ ] Users should be able to subscribe to an endpoint that should provide live rates.
-- [ ] Users should have the ability to see their portfolio
+- [ x ] Users should have the ability to see their portfolio
     
 The code you write is expected to be good quality, it should:
 * Have correct formatting
@@ -175,6 +175,138 @@ Response:
     ```
     {
         "balance": <account balance>
+    }
+    ```
+
+<span style="color:red">401</span>  
+    ```
+    Unauthorized
+    ```
+
+#### <span style="color:#30c821">GET</span> /api/account/portfolio
+Headers:  
+    ```
+    {
+        Authorization: "Bearer {{jwt_token}}
+    }
+    ```
+
+Params:  
+    ```
+    {}
+    ```
+
+Response:  
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        "portfolio": {
+            <ticker>: <amount>
+        }
+    }
+    ```
+
+<span style="color:red">401</span>  
+    ```
+    Unauthorized
+    ```
+
+#### <span style="color:yellow">POST</span> /api/account/portfolio/buy
+Headers:  
+    ```
+    {
+        Authorization: "Bearer {{jwt_token}}
+    }
+    ```
+
+Body:  
+    ```
+    {
+        ticker: String,
+        amount: Number
+    }
+    ```
+
+Response:  
+With enough balance:
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        message: "Success!",
+        action: "BUY",
+        stock: {
+            ticker: String,
+            company: String,
+            price: Number
+        },
+        amount: Number
+    }
+    ```
+User Error
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        error: String
+    }
+    ```
+
+Server Error
+<span style="color:red">500</span>  
+    ```
+    {
+        <error string>
+    }
+    ```
+
+<span style="color:red">401</span>  
+    ```
+    Unauthorized
+    ```
+
+#### <span style="color:yellow">POST</span> /api/account/portfolio/sell
+Headers:  
+    ```
+    {
+        Authorization: "Bearer {{jwt_token}}
+    }
+    ```
+
+Body:  
+    ```
+    {
+        ticker: String,
+        amount: Number
+    }
+    ```
+
+Response:  
+With enough shares:
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        message: "Success!",
+        action: "SELL",
+        stock: {
+            ticker: String,
+            company: String,
+            price: Number
+        },
+        amount: Number
+    }
+    ```
+User Error
+<span style="color:#30c821">200</span>  
+    ```
+    {
+        error: String
+    }
+    ```
+
+Server Error
+<span style="color:red">500</span>  
+    ```
+    {
+        <error string>
     }
     ```
 
