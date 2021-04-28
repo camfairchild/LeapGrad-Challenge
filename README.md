@@ -62,175 +62,175 @@ Body:
 
 Response:  
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         "message": "Registration successful!",
         "user": <user Object>
     }
-    ```
+    
 
 <span style="color:red">422</span>  
-    ```
+    
     {
         "message": "Registration unsuccessful"
     }
-    ```
+    
 
 #### <span style="color:yellow">POST</span> /api/auth/login
 Body:  
-    ```
+    
     {
         "username": <username>,
         "password": <password>
     }
-    ```
+    
 
 Response:  
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         "message": "Login successful!",
         "token": <bearer token string>
     }
-    ```
+    
 
 <span style="color:red">401</span>  
-    ```
+    
     {
         "error": "Incorrect credentials"
     }
-    ```
+    
 
 <!---
 #### <span style="color:yellow">POST</span> /api/auth/logout
 Headers:  
-    ```
+    
     {
         Authorization: "Bearer {{jwt_token}}
     }
-    ```
+    
 
 Body:  
-    ```
+    
     {}
-    ```
+    
 
 Response:  
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         "message": "Logout successful!"
     }
-    ```
+    
 
 <span style="color:red">401</span>  
-    ```
+    
     Unauthorized
-    ```
+    
 --->
 
 #### <span style="color:#30c821">GET</span> /api/account/balance
 Headers:  
-    ```
+    
     {
         Authorization: "Bearer {{jwt_token}}
     }
-    ```
+    
 
 Parameters:  
-    ```
+    
     {}
-    ```
+    
 
 Response:  
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         "balance": <account balance>
     }
-    ```
+    
 
 <span style="color:red">401</span>  
-    ```
+    
     Unauthorized
-    ```
+    
 
 #### <span style="color:yellow">POST</span> /api/account/balance
 Headers:  
-    ```
+    
     {
         Authorization: "Bearer {{jwt_token}}
     }
-    ```
+    
 
 Body:  
-    ```
+    
     {
         "amount": <numeric increase to balance>
     }
-    ```
+    
 
 Response:  
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         "balance": <account balance>
     }
-    ```
+    
 
 <span style="color:red">401</span>  
-    ```
+    
     Unauthorized
-    ```
+    
 
 #### <span style="color:#30c821">GET</span> /api/account/portfolio
 Headers:  
-    ```
+    
     {
         Authorization: "Bearer {{jwt_token}}
     }
-    ```
+    
 
 Params:  
-    ```
+    
     {}
-    ```
+    
 
 Response:  
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         "portfolio": {
             <ticker>: <amount>
         }
     }
-    ```
+    
 
 <span style="color:red">401</span>  
-    ```
+    
     Unauthorized
-    ```
+    
 
 #### <span style="color:yellow">POST</span> /api/account/portfolio/buy
 Headers:  
-    ```
+    
     {
         Authorization: "Bearer {{jwt_token}}
     }
-    ```
+    
 
 Body:  
-    ```
+    
     {
         ticker: String,
         amount: Number
     }
-    ```
+    
 
 Response:  
 ##### With enough balance:
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         message: "Success!",
         action: "BUY",
@@ -241,49 +241,49 @@ Response:
         },
         amount: Number
     }
-    ```
+    
 
 ##### User Error
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         error: String
     }
-    ```
+    
 
 ##### Server Error
 <span style="color:red">500</span>  
-    ```
+    
     {
         <error string>
     }
-    ```
+    
 
 <span style="color:red">401</span>  
-    ```
+    
     Unauthorized
-    ```
+    
 
 #### <span style="color:yellow">POST</span> /api/account/portfolio/sell
 Headers:  
-    ```
+    
     {
         Authorization: "Bearer {{jwt_token}}
     }
-    ```
+    
 
 Body:  
-    ```
+    
     {
         ticker: String,
         amount: Number
     }
-    ```
+    
 
 Response:  
 ##### With enough shares:
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         message: "Success!",
         action: "SELL",
@@ -294,28 +294,28 @@ Response:
         },
         amount: Number
     }
-    ```
+    
 
 ##### User Error
 <span style="color:#30c821">200</span>  
-    ```
+    
     {
         error: String
     }
-    ```
+    
 
 ##### Server Error
 <span style="color:red">500</span>  
-    ```
+    
     {
         <error string>
     }
-    ```
+    
 
 <span style="color:red">401</span>  
-    ```
+    
     Unauthorized
-    ```
+    
 
 ### Test
 
