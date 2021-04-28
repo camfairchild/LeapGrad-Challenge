@@ -7,3 +7,5 @@ export class OutOfStockError extends StockQuantityError {};
 export class NonWholeStockQuantityError extends StockQuantityError {};
 
 export class OutOfFundsError extends StockError {};
+
+export class TickerDoesNotExistError extends StockError {};
