@@ -112,3 +112,7 @@ export async function sellStock(username, ticker, amount) {
     removeStock(user, ticker, amount); // remove stock from portfolio
     await updateBalance(user, cost); // increase balance
 }
+
+export async function getAllStocks() {
+    return await Stock.find();
+}
