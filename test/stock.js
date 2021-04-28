@@ -24,7 +24,6 @@ describe("stock", () => {
             var user = await createUser(username, password);
             addStock(user, "APPL", 5);
             let portfolio = getPortfolio(user);
-            console.log(portfolio);
             portfolio.size.should.be.greaterThan(0);
             portfolio.get("APPL").should.be.eql(5);
         });
