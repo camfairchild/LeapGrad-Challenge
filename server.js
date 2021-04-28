@@ -22,7 +22,8 @@ import events from './src/routes/events.js';
 let port = process.env.PORT || 3000;
 
 let db_connection;
-if (process.env.NODE_ENV === "test") {
+if (process.env.NODE_ENV.trim() == "test") { // is set to "test" + " "
+    console.log("testing...");
     db_connection = connect(process.env.MONGO_URI_test);
 } else {
     db_connection = connect(process.env.MONGO_URI_prod);
