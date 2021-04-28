@@ -85,9 +85,7 @@ db_connection.on('error', console.error.bind(console, 'database connection error
 
 db_connection.once('open', () => {
     // On database connection
-    io.sockets.on('connection', (socket) => {
-        events(socket, io);
-    });
+    events(io);
     
     // catch 404
     app.use(function(req, res, next) {
