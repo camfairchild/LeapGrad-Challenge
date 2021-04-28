@@ -53,12 +53,12 @@ Either using yarn or npm
 
 #### <span style="color:yellow">POST</span> /api/auth/register
 Body:  
-    ```json
+    
     {
         "username": <username>,
         "password": <password>
     }
-    ```
+    
 
 Response:  
 <span style="color:#30c821">200</span>  
