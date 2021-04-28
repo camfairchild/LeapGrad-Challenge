@@ -11,7 +11,7 @@ export function removeStock(user, ticker, amount) {
     }
     if (!user.portfolio.has(ticker)) {
         // doesnt have any of this stock
-        throw new OutOfStockError("Your portfolio doesn't have any of that stock to remove!");
+        throw new OutOfStockError("Your portfolio doesn't have enough of that stock to remove!");
     } else {
         // has the stock
         const qty = user.portfolio.get(ticker);
