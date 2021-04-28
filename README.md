@@ -3,11 +3,11 @@
 Build a stock market tracking system.
 ### Section 1
 Your system should have
-- [ x ] support for users to login/logout.
-- [ x ] Users should be able to add balance to their wallet.
-- [ x ] Users should be able to buy/sell shares (transactions need not be stored)
+- [x] support for users to login/logout.
+- [x] Users should be able to add balance to their wallet.
+- [x] Users should be able to buy/sell shares (transactions need not be stored)
 - [ ] Users should be able to subscribe to an endpoint that should provide live rates.
-- [ x ] Users should have the ability to see their portfolio
+- [x] Users should have the ability to see their portfolio
     
 The code you write is expected to be good quality, it should:
 * Have correct formatting
