@@ -5,3 +5,5 @@ export class StockQuantityError extends StockError {};
 export class OutOfStockError extends StockQuantityError {};
 
 export class NonWholeStockQuantityError extends StockQuantityError {};
+
+export class OutOfFundsError extends StockError {};
