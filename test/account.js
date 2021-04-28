@@ -324,9 +324,9 @@ chai.should();
             res.should.have.status(200);
             // set jwt token
             var token = res.body.token;
-            // make get to portfolio sell endpoint
+            // make get to portfolio buy endpoint
             let res2 = await chai.request(server)
-                .post('/api/account/portfolio/sell')
+                .post('/api/account/portfolio/buy')
                 .set({ "Authorization": `Bearer ${token}`})
                 .send({
                     ticker: "TEST", // has price of 2.00
