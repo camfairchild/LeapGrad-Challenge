@@ -47,14 +47,14 @@ describe("db: user", () => {
         // Test registration
         it("should update user balance", async () => {
             await registerUser("username", "password");
-            await ByupdateBalanceByUsername("username", 10);
+            await updateBalanceByUsername("username", 10);
             var user_ = await getUserByUsername("username");
             user_.balance.should.equal(10);
         });
 
         it("should get user balance", async () => {
             await registerUser("username", "password");
-            await ByupdateBalanceByUsername("username", 10);
+            await updateBalanceByUsername("username", 10);
             let balance = await getBalanceByUsername("username");
             balance.should.equal(10);
         });
@@ -152,13 +152,13 @@ describe("db: user", () => {
 
             await buyStock("username", "FREE", 1); // price is 0.00
 
-            (await getPortfolioByUsername("username")).get("FREE").eql(1);
+            (await getPortfolioByUsername("username")).get("FREE").should.eql(1);
         });
 
         it("should buy stock for user", async () => {
             await registerUser("username", "password");
             
-            await ByupdateBalanceByUsername("username", 10.00); // make balance = 10.00
+            await updateBalanceByUsername("username", 10.00); // make balance = 10.00
 
             await buyStock("username", "TEST", 1);
 
@@ -171,7 +171,7 @@ describe("db: user", () => {
         it("should sell some stock for user", async () => {
             await registerUser("username", "password");
             
-            await ByupdateBalanceByUsername("username", 10.00); // make balance = 10.00
+            await updateBalanceByUsername("username", 10.00); // make balance = 10.00
             await buyStock("username", "TEST", 2); // buy 2 of TEST for 2.00 * 2 = 4.00
             (await getBalanceByUsername("username")).should.be.eql(6.00); // balance is now 6.00
 
@@ -186,7 +186,7 @@ describe("db: user", () => {
         it("should sell all stock for user", async () => {
             await registerUser("username", "password");
             
-            await ByupdateBalanceByUsername("username", 10.00); // make balance = 10.00
+            await updateBalanceByUsername("username", 10.00); // make balance = 10.00
             await buyStock("username", "TEST", 1); // buy 1 of TEST for 2.00
             (await getBalanceByUsername("username")).should.be.eql(8.00); // balance is now 8.00
 
@@ -201,7 +201,7 @@ describe("db: user", () => {
         it("should only sell stock if user has enough shares", async () => {
             await registerUser("username", "password");
             
-            await ByupdateBalanceByUsername("username", 10.00); // make balance = 10.00
+            await updateBalanceByUsername("username", 10.00); // make balance = 10.00
             await buyStock("username", "TEST", 1); // buy 1 of TEST for 2.00
             (await getBalanceByUsername("username")).should.be.eql(8.00); // balance is now 8.00
 
@@ -216,7 +216,7 @@ describe("db: user", () => {
         it("should only buy stock if user has enough funds", async () => {
             await registerUser("username", "password");
             
-            await ByupdateBalanceByUsername("username", 1.00); // make balance = 1.00
+            await updateBalanceByUsername("username", 1.00); // make balance = 1.00
 
             buyStock("username", "TEST", 1).should.be.rejectedWith(OutOfFundsError);
 
@@ -229,8 +229,8 @@ describe("db: user", () => {
         it("should only take valid input", async () => {
             await registerUser("username", "password");
             
-            await ByupdateBalanceByUsername("username", 5.00); // make balance = 1.00
-            buyStock("username", "TEST", 1); // balance == 3.00, TEST: 1
+            await updateBalanceByUsername("username", 5.00); // make balance = 1.00
+            await buyStock("username", "TEST", 1); // balance == 3.00, TEST: 1
 
             buyStock("username", "TEST", -1).should.be.rejectedWith(NonWholeStockQuantityError);
             buyStock("username", "TEST", NaN).should.be.rejectedWith(NonWholeStockQuantityError);
@@ -241,9 +241,9 @@ describe("db: user", () => {
             sellStock("username", "TEST", "a").should.be.rejectedWith(NonWholeStockQuantityError);
 
             var pf = await getPortfolioByUsername("username");
-            pf.has("TEST").should.be.false; // couldn't buy
+            pf.get("TEST").should.be.eql(1); // couldn't buy more than 1
             var balance = await getBalanceByUsername("username");
-            balance.should.be.eql(1.00); // balance unchanged
+            balance.should.be.eql(3.00); // balance unchanged
         });
     });
 

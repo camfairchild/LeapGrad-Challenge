@@ -94,7 +94,7 @@ export async function buyStock(username, ticker, amount) {
     var cost = amount * stock.price;
     if (user.balance >= cost) {
         addStock(user, ticker, amount); // add stock to portfolio
-        updateBalance(user, cost * -1); // decrease balance
+        await updateBalance(user, cost * -1); // decrease balance
     } else {
         throw new OutOfFundsError("Your balance isn't high enough!");
     }
@@ -106,5 +106,5 @@ export async function sellStock(username, ticker, amount) {
     var stock = await getStockByTicker(ticker);
     var cost = amount * stock.price;
     removeStock(user, ticker, amount); // remove stock from portfolio
-    updateBalance(user, cost); // increase balance
+    await updateBalance(user, cost); // increase balance
 }
