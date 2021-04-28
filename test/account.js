@@ -8,14 +8,15 @@ import chaiHttp from "chai-http";
 chai.use(chai_as_promised);
 chai.use(chaiHttp);
 
-import { connect, registerUser, loginUser, updateBalance, getBalance } from "../src/db/db.js";
+import { connect, registerUser, updateBalance, getBalance, getPortfolioByUsername, buyStock, sellStock } from "../src/db/db.js";
 import User from "../src/models/user.js";
+import Stock from "../src/models/stock.js";
 import { server } from "../server.js";
 
 var db_connection;
 
 before(async () => {
-    db_connection = await connect(process.env.MONGO_URI_test); // test db
+    db_connection = connect(process.env.MONGO_URI_test); // test db
     return db_connection;
 });
 
@@ -114,6 +115,229 @@ chai.should();
                 .set({ "Authorization": `Bearer ${token}`});
             res2.should.have.status(200);
             res2.body.should.have.property("balance").eql(10.00);
+        });
+    });
+
+    describe("portfolio functions", () => {
+        before((done) => {
+            User.collection.createIndex({ "username": 1 }, { unique: true }).then(() => {
+                User.collection.deleteMany().then(() => {
+                    Stock.collection.deleteMany().then(async () => {
+                        var t = new Stock({
+                            company: "test",
+                            ticker: "TEST",
+                            price: 2.00
+                        });
+                        
+                        await t.save();
+        
+                        var f = new Stock({
+                            company: "free",
+                            ticker: "FREE",
+                            price: 0.00
+                        });
+        
+                        await f.save();
+                        done();
+                    }).catch((err) => {
+                        done(err);
+                    });
+                }).catch((err) => {
+                    done(err);
+                });
+            }).catch((err) => {
+                done(err);
+            });
+        });
+        
+        afterEach((done) => {
+            User.collection.deleteMany().then(() => {
+                done();
+            }).catch((err) => {
+                done(err);
+            });
+        });
+
+        // Integration test of user get portfolio
+        it("should get user portfolio", async () => {
+            await registerUser("username", "password");
+
+            buyStock("username", "FREE", 1); // price is 0.00
+
+            // login user
+            let res = await chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "username",
+                    password: "password"
+                });
+            res.should.have.status(200);
+            // set jwt token
+            var token = res.body.token;
+            // make get to portfolio endpoint
+            let res2 = await chai.request(server)
+                .get('/api/account/portfolio')
+                .set({ "Authorization": `Bearer ${token}`})
+            res2.should.have.status(200);
+            res2.should.have.property("portfolio").get("FREE").should.be.eql(1);
+        });
+
+        it("should buy stock for user", async () => {
+            await registerUser("username", "password");
+            
+            await updateBalance("username", 10.00); // make balance = 10.00
+
+            // login user
+            let res = await chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "username",
+                    password: "password"
+                });
+            res.should.have.status(200);
+            // set jwt token
+            var token = res.body.token;
+            // make get to portfolio endpoint
+            let res2 = await chai.request(server)
+                .post('/api/account/portfolio/buy')
+                .set({ "Authorization": `Bearer ${token}`})
+                .send({
+                    ticker: "TEST", // has price of 2.00
+                    amount: 1
+                });
+            res2.should.have.status(200);
+            var pf = await getPortfolioByUsername("username");
+            pf.get("TEST").should.be.eql(1);
+            var balance = await getBalance("username");
+            balance.should.be.eql(8.00); // 10.00 - 2.00 === 8.00
+        });
+
+        it("should sell some stock for user", async () => {
+            await registerUser("username", "password");
+            
+            await updateBalance("username", 10.00); // make balance = 10.00
+            await buyStock("username", "TEST", 2); // buy 2 of TEST for 2.00 * 2 = 4.00
+            (await getBalance("username")).should.be.eql(6.00); // balance is now 6.00
+
+            // login user
+            let res = await chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "username",
+                    password: "password"
+                });
+            res.should.have.status(200);
+            // set jwt token
+            var token = res.body.token;
+            // make get to portfolio endpoint
+            let res2 = await chai.request(server)
+                .post('/api/account/portfolio/sell')
+                .set({ "Authorization": `Bearer ${token}`})
+                .send({
+                    ticker: "TEST", // has price of 2.00
+                    amount: 1
+                });
+            res2.should.have.status(200);
+            var pf = await getPortfolioByUsername("username");
+            pf.get("TEST").should.be.eql(1); // has 1 left
+            var balance = await getBalance("username");
+            balance.should.be.eql(8.00); // 6.00 + 2.00 === 8.00
+        });
+
+        it("should sell all stock for user", async () => {
+            await registerUser("username", "password");
+            
+            await updateBalance("username", 10.00); // make balance = 10.00
+            await buyStock("username", "TEST", 1); // buy 1 of TEST for 2.00
+            (await getBalance("username")).should.be.eql(8.00); // balance is now 8.00
+
+            // login user
+            let res = await chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "username",
+                    password: "password"
+                });
+            res.should.have.status(200);
+            // set jwt token
+            var token = res.body.token;
+            // make get to portfolio endpoint
+            let res2 = await chai.request(server)
+                .post('/api/account/portfolio/sell')
+                .set({ "Authorization": `Bearer ${token}`})
+                .send({
+                    ticker: "TEST", // has price of 2.00
+                    amount: 1
+                });
+            res2.should.have.status(200);
+            var pf = await getPortfolioByUsername("username");
+            pf.has("TEST").should.be.false; // has none left, ticker removed
+            var balance = await getBalance("username");
+            balance.should.be.eql(10.00); // 8.00 + 2.00 === 10.00
+        });
+
+        it("should only sell stock if user has enough", async () => {
+            await registerUser("username", "password");
+            
+            await updateBalance("username", 10.00); // make balance = 10.00
+            await buyStock("username", "TEST", 1); // buy 1 of TEST for 2.00
+            (await getBalance("username")).should.be.eql(8.00); // balance is now 8.00
+
+            // login user
+            let res = await chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "username",
+                    password: "password"
+                });
+            res.should.have.status(200);
+            // set jwt token
+            var token = res.body.token;
+            // make get to portfolio endpoint
+            let res2 = await chai.request(server)
+                .post('/api/account/portfolio/sell')
+                .set({ "Authorization": `Bearer ${token}`})
+                .send({
+                    ticker: "TEST", // has price of 2.00
+                    amount: 2 // user only has 1
+                });
+            res2.should.have.status(200);
+            res2.should.have.property("error").eql("Your portfolio doesn't have enough of that stock to remove!");
+            var pf = await getPortfolioByUsername("username");
+            pf.has("TEST").should.be.true; // has 1 left, nothing sold
+            var balance = await getBalance("username");
+            balance.should.be.eql(8.00); // balance unchanged
+        });
+
+        it("should only buy stock if user has enough funds", async () => {
+            await registerUser("username", "password");
+            
+            await updateBalance("username", 1.00); // make balance = 1.00
+
+            // login user
+            let res = await chai.request(server)
+                .post('/api/auth/login')
+                .send({
+                    username: "username",
+                    password: "password"
+                });
+            res.should.have.status(200);
+            // set jwt token
+            var token = res.body.token;
+            // make get to portfolio endpoint
+            let res2 = await chai.request(server)
+                .post('/api/account/portfolio/sell')
+                .set({ "Authorization": `Bearer ${token}`})
+                .send({
+                    ticker: "TEST", // has price of 2.00
+                    amount: 1 // user only has $1.00
+                });
+            res2.should.have.status(200);
+            res2.should.have.property("error").eql("Your balance isn't high enough!");
+            var pf = await getPortfolioByUsername("username");
+            pf.has("TEST").should.be.false; // couldn't buy
+            var balance = await getBalance("username");
+            balance.should.be.eql(1.00); // balance unchanged
         });
     });
 });
