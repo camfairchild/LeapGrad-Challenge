@@ -3,7 +3,7 @@ let router = express.Router();
 
 import passport from "passport";
 
-import { updateBalance, getBalance } from "../db/db.js";
+import { updateBalanceByUsername, getBalanceByUsername } from "../db/db.js";
 
 function isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -13,7 +13,7 @@ router.use(passport.authenticate('jwt', { session: false }));
 
 router.route('/balance')
     .get((req, res) => {
-        getBalance(req.user.username).then((balance) => {
+        getBalanceByUsername(req.user.username).then((balance) => {
             res.status(200).json({
                     balance: balance
             })
@@ -27,7 +27,7 @@ router.route('/balance')
                 { error: "Invalid amount" }
             )
         } else {
-            updateBalance(req.user.username, parseFloat(req.body.amount)).then((balance) => {      
+            updateBalanceByUsername(req.user.username, parseFloat(req.body.amount)).then((balance) => {      
                 res.status(200).json({
                     balance: balance
                 })

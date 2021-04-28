@@ -8,7 +8,7 @@ import chaiHttp from "chai-http";
 chai.use(chai_as_promised);
 chai.use(chaiHttp);
 
-import { connect, registerUser, updateBalance, getBalance, getPortfolioByUsername, buyStock, sellStock } from "../src/db/db.js";
+import { connect, registerUser, updateBalanceByUsername, getBalanceByUsername, getPortfolioByUsername, buyStock, sellStock } from "../src/db/db.js";
 import User from "../src/models/user.js";
 import Stock from "../src/models/stock.js";
 import { server } from "../server.js";
@@ -24,7 +24,7 @@ chai.should();
 
 /** Test
  */
- describe("account api endpoints", () => {
+describe("account api endpoints", () => {
 
     describe("user functions", () => {
         before((done) => {
@@ -69,7 +69,7 @@ chai.should();
                     amount: 10.00
                 })
             res2.should.have.status(200);
-            let balance = await getBalance("username");
+            let balance = await getBalanceByUsername("username");
             balance.should.be.eql(10.00);
         });
 
@@ -108,7 +108,7 @@ chai.should();
             // get jwt token
             var token = res.body.token;
             // set user balance
-            await updateBalance("username", 10.00);
+            await updateBalanceByUsername("username", 10.00);
             // make get to balance endpoint
             let res2 = await chai.request(server)
                 .get('/api/account/balance')
@@ -185,7 +185,7 @@ chai.should();
         it("should buy stock for user", async () => {
             await registerUser("username", "password");
             
-            await updateBalance("username", 10.00); // make balance = 10.00
+            await updateBalanceByUsername("username", 10.00); // make balance = 10.00
 
             // login user
             let res = await chai.request(server)
@@ -208,16 +208,16 @@ chai.should();
             res2.should.have.status(200);
             var pf = await getPortfolioByUsername("username");
             pf.get("TEST").should.be.eql(1);
-            var balance = await getBalance("username");
+            var balance = await getBalanceByUsername("username");
             balance.should.be.eql(8.00); // 10.00 - 2.00 === 8.00
         });
 
         it("should sell some stock for user", async () => {
             await registerUser("username", "password");
             
-            await updateBalance("username", 10.00); // make balance = 10.00
+            await updateBalanceByUsername("username", 10.00); // make balance = 10.00
             await buyStock("username", "TEST", 2); // buy 2 of TEST for 2.00 * 2 = 4.00
-            (await getBalance("username")).should.be.eql(6.00); // balance is now 6.00
+            (await getBalanceByUsername("username")).should.be.eql(6.00); // balance is now 6.00
 
             // login user
             let res = await chai.request(server)
@@ -240,16 +240,16 @@ chai.should();
             res2.should.have.status(200);
             var pf = await getPortfolioByUsername("username");
             pf.get("TEST").should.be.eql(1); // has 1 left
-            var balance = await getBalance("username");
+            var balance = await getBalanceByUsername("username");
             balance.should.be.eql(8.00); // 6.00 + 2.00 === 8.00
         });
 
         it("should sell all stock for user", async () => {
             await registerUser("username", "password");
             
-            await updateBalance("username", 10.00); // make balance = 10.00
+            await updateBalanceByUsername("username", 10.00); // make balance = 10.00
             await buyStock("username", "TEST", 1); // buy 1 of TEST for 2.00
-            (await getBalance("username")).should.be.eql(8.00); // balance is now 8.00
+            (await getBalanceByUsername("username")).should.be.eql(8.00); // balance is now 8.00
 
             // login user
             let res = await chai.request(server)
@@ -272,16 +272,16 @@ chai.should();
             res2.should.have.status(200);
             var pf = await getPortfolioByUsername("username");
             pf.has("TEST").should.be.false; // has none left, ticker removed
-            var balance = await getBalance("username");
+            var balance = await getBalanceByUsername("username");
             balance.should.be.eql(10.00); // 8.00 + 2.00 === 10.00
         });
 
         it("should only sell stock if user has enough shares", async () => {
             await registerUser("username", "password");
             
-            await updateBalance("username", 10.00); // make balance = 10.00
+            await updateBalanceByUsername("username", 10.00); // make balance = 10.00
             await buyStock("username", "TEST", 1); // buy 1 of TEST for 2.00
-            (await getBalance("username")).should.be.eql(8.00); // balance is now 8.00
+            (await getBalanceByUsername("username")).should.be.eql(8.00); // balance is now 8.00
 
             // login user
             let res = await chai.request(server)
@@ -305,14 +305,14 @@ chai.should();
             res2.should.have.property("error").eql("Your portfolio doesn't have enough of that stock to remove!");
             var pf = await getPortfolioByUsername("username");
             pf.has("TEST").should.be.true; // has 1 left, nothing sold
-            var balance = await getBalance("username");
+            var balance = await getBalanceByUsername("username");
             balance.should.be.eql(8.00); // balance unchanged
         });
 
         it("should only buy stock if user has enough funds", async () => {
             await registerUser("username", "password");
             
-            await updateBalance("username", 1.00); // make balance = 1.00
+            await updateBalanceByUsername("username", 1.00); // make balance = 1.00
 
             // login user
             let res = await chai.request(server)
@@ -336,14 +336,14 @@ chai.should();
             res2.should.have.property("error").eql("Your balance isn't high enough!");
             var pf = await getPortfolioByUsername("username");
             pf.has("TEST").should.be.false; // couldn't buy
-            var balance = await getBalance("username");
+            var balance = await getBalanceByUsername("username");
             balance.should.be.eql(1.00); // balance unchanged
         });
 
         it("should only take valid input", async () => {
             await registerUser("username", "password");
             
-            await updateBalance("username", 5.00); // make balance = 1.00
+            await updateBalanceByUsername("username", 5.00); // make balance = 1.00
             buyStock("username", "TEST", 1); // balance == 3.00, TEST: 1
 
             // login user
@@ -427,7 +427,7 @@ chai.should();
 
             var pf = await getPortfolioByUsername("username");
             pf.has("TEST").should.be.false; // couldn't buy
-            var balance = await getBalance("username");
+            var balance = await getBalanceByUsername("username");
             balance.should.be.eql(1.00); // balance unchanged
         });
     });
