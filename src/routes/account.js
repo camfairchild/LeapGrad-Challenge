@@ -3,7 +3,8 @@ let router = express.Router();
 
 import passport from "passport";
 
-import { updateBalanceByUsername, getBalanceByUsername } from "../db/db.js";
+import { updateBalanceByUsername, getBalanceByUsername, getPortfolioByUsername, buyStock, sellStock, getStockByTicker } from "../db/db.js";
+import { TickerDoesNotExistError, StockError } from "../errors/StockErrors.js";
 
 function isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
@@ -37,4 +38,66 @@ router.route('/balance')
         }
     })
 
+router.route('/portfolio')
+        .get(async (req, res) => {
+            var username = req.user.username;
+            var portfolio = await getPortfolioByUsername(username);
+            res.status(200).json({ portfolio });
+        })
+
+router.route('/portfolio/buy')
+        .post((req, res) => {
+            var username = req.user.username;
+            var ticker = req.body.ticker;
+            var amount = req.body.amount;
+            getStockByTicker(ticker).then((stock) => {
+                buyStock(username, ticker, amount).then(() => {
+                    res.status(200).send({ message: "Success!", action: "BUY", stock: stock, amount: amount });
+                }).catch((err) => {
+                    if (err instanceof StockError) {
+                        res.status(200).json({
+                            error: err.message
+                        });
+                    } else {
+                        res.status(500).json(err);
+                    }
+                })
+            }).catch((err) => {
+                if (err instanceof TickerDoesNotExistError) {
+                    res.status(200).json({
+                        error: err.message
+                    });
+                } else {
+                    res.status(500).json(err);
+                }
+            })
+        })
+
+router.route('/portfolio/sell')
+        .post((req, res) => {
+            var username = req.user.username;
+            var ticker = req.body.ticker;
+            var amount = req.body.amount;
+            getStockByTicker(ticker).then((stock) => {
+                sellStock(username, ticker, amount).then(() => {
+                    res.status(200).send({ message: "Success!", action: "SELL", stock: stock, amount: amount });
+                }).catch((err) => {
+                    if (err instanceof StockError) {
+                        res.status(200).json({
+                            error: err.message
+                        });
+                    } else {
+                        res.status(500).json(err);
+                    }
+                })
+            }).catch((err) => {
+                if (err instanceof TickerDoesNotExistError) {
+                    res.status(200).json({
+                        error: err.message
+                    });
+                } else {
+                    res.status(500).json(err);
+                }
+            })
+        })
 export default router;

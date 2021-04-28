@@ -5,7 +5,7 @@ import Stock from "../models/stock.js";
 import { createUser, checkLogin } from "../user.js";
 import { addStock, removeStock, getPortfolio } from "../stock.js";
 import { UniqueUserError } from "../errors/UserRegistrationErrors.js";
-import { OutOfStockError, NonWholeStockQuantityError, OutOfFundsError, StockError } from "../errors/StockErrors.js";
+import { OutOfStockError, NonWholeStockQuantityError, OutOfFundsError, StockError, TickerDoesNotExistError } from "../errors/StockErrors.js";
 
 export function connect(uri) {
     mongoose.connect(
@@ -79,7 +79,11 @@ export async function getBalanceByUsername(username) {
 }
 
 export async function getStockByTicker(ticker) {
-    return await Stock.findOne({ ticker: ticker });
+    var stock = await Stock.findOne({ ticker: ticker });
+    if (!stock) {
+        throw new TickerDoesNotExistError('This ticker does not exist!');
+    }
+    return stock;
 }
 
 export async function getPortfolioByUsername(username) {
