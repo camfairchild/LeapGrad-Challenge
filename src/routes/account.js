@@ -13,14 +13,12 @@ router.use(passport.authenticate('jwt', { session: false }));
 
 router.route('/balance')
     .get((req, res) => {
-        getBalance(req.user.username, (err, balance) => {
-            if (err) {
-                res.status(500).json(err);
-            } else {
-                res.status(200).json({
+        getBalance(req.user.username).then((balance) => {
+            res.status(200).json({
                     balance: balance
-                })
-            }
+            })
+        }).catch((err) => {
+            res.status(500).json(err);
         })
     })
     .post((req, res) => {
@@ -29,14 +27,12 @@ router.route('/balance')
                 { error: "Invalid amount" }
             )
         } else {
-            updateBalance(req.user.username, parseFloat(req.body.amount), (err, balance) => {
-                if (err) {
-                    res.status(500).json(err);
-                } else {
-                    res.status(200).json({
-                        balance: balance
-                    })
-                }
+            updateBalance(req.user.username, parseFloat(req.body.amount)).then((balance) => {      
+                res.status(200).json({
+                    balance: balance
+                })
+            }).catch((err) => {
+                res.status(500).json(err);
             })
         }
     })

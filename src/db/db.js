@@ -18,8 +18,7 @@ export function connect(uri) {
 export async function registerUser(username, password) {
     let user = await createUser(username, password);
     try {
-        var doc = await user.save();
-        return doc;
+        return await user.save();
     } catch (err) {
         if (err.name === 'MongoError' && err.code === 11000) {
             // Duplicate username error
@@ -30,47 +29,42 @@ export async function registerUser(username, password) {
     }
 }
 
-export function getUserByUsername(username, done) {
-    User.findOne({ "username": username }, (err, doc) => {
-        if (err) {
-            done(err);
+export async function getUserByUsername(username) {
+    return await User.findOne({ "username": username });
+}
+
+export function loginUser(username, password, done) {
+    getUserByUsername(username).then((user) => {
+        if (!user) {
+            // User does not exist
+            done(null, false);
         } else {
-            done(null, doc);
+            // try to login
+            checkLogin(user, password).then((result) => {
+                if (result) {
+                    done(null, user);
+                } else {
+                    done(null, false);
+                }
+            }).catch((err) => {
+                done(err);
+            })
         }
+    }).catch((err) => {
+        done(err);
     })
 }
 
-export async function loginUser(username, password, done) {
-    getUserByUsername(username, (err, user) => {
-        if (err) {
-            // Error
-            done(err);
-        } else {
-            if (!user) {
-                // User does not exist
-                done(null, false);
-            } else {
-                // try to login
-                checkLogin(user, password, done);
-            }
-        }
-    });
+export async function updateBalance(username, amount) {
+    var user = await getUserByUsername(username);
+    user.balance += amount;
+    let user_ = await user.save()
+    return user_.balance;
 }
 
-export function updateBalance(username, amount, done) {
-    getUserByUsername(username, (err, user) => {
-        if (err) done(err);
-        user.balance += amount;
-        user.save((err, doc) => {
-            if (err) done(err);
-            done(err, doc.balance);
-        })
-    })
+export async function getBalance(username) {
+    let user = await getUserByUsername(username);
+    return user.balance;
 }
 
-export function getBalance(username, done) {
-    getUserByUsername(username, (err, user) => {
-        if (err) throw err;
-        done(null, user.balance);
-    });
-}
+export function getStockByTicker(ticker) {}

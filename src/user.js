@@ -4,17 +4,10 @@ import bcrypt from "bcrypt";
 import { UserRegistrationError } from "./errors/UserRegistrationErrors.js";
 import User from "./models/user.js";
 
-export async function checkLogin(user, password, done) {
+export async function checkLogin(user, password) {
     var hash = user.password_hash;
     
-    bcrypt.compare(password, hash, (err, same) => {
-        if (err) done(err);
-        if (same) {
-            done(null, user);
-        } else {
-            done(null, false);
-        }
-    });
+    return await bcrypt.compare(password, hash);
 }
 
 export async function createUser(username, password) {
