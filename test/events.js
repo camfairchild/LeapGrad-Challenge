@@ -120,13 +120,13 @@ describe("stock live feed", () => {
         it("should receive price updates", (done) => {
             clientSocket.on("update one", (stock) => {
                 stock.should.have.property("price").eql(5.00);
-                console.log(stock);
                 done();
             });
             // change price of a stock
-            getStockByTicker("TEST").then((stock_) => {
+            getStockByTicker("TEST").then(async (stock_) => {
                 stock_.price = 5.00;
-                stock_.save();
+                await stock_.save();
+                console.log("saved stock");
             })
         });
     });
