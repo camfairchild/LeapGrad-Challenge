@@ -356,17 +356,19 @@ Response:
 ### Socket Live Feed
 
 After logging-in `GET /api/auth/login` you can use your JWT token to subscribe to the live price feed.  
-The client must connect using an auth token
+The client must connect using an auth token  
+
     auth: {
         token: <jwt token>
     }
 
 #### on("connect_error")
 If the client's JWT token is invalid, or there is a server error, the "connect_error" event will fire.  
-This event is emittedm and the client is disconnected from the socket.  
+This event is emitted and the client is disconnected from the socket.  
 
 #### on("update one", stock)
 This event is emitted when a price is updated for the stock `stock`.  
+
     {
         "company":"test",
         "ticker":"TEST",
@@ -374,7 +376,8 @@ This event is emitted when a price is updated for the stock `stock`.
     }
 
 #### emit('update', cb)
-The client can emit the "update" event with a callback function:
+The client can emit the "update" event with a callback function:  
+
     function (arr) {
         console.log(arr); // print array of stocks with information to console
     }
