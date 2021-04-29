@@ -21,7 +21,10 @@ export default function(io) {
     });
 
     io.sockets.on('connection', (socket) => {
-        Stock.schema.on("saved", (doc) => {
+        console.log("connected!!");
+        // listen for changed event
+        // emit updated doc to socket
+        Stock.schema.on("changed", (doc) => {
             socket.emit("update one", doc);
         })       
 
@@ -29,5 +32,30 @@ export default function(io) {
             var arr = await getAllStocks();
             cb(arr);
         });
+
+        socket.on("new", async () => {
+            var t = new Stock({
+                company: "test",
+                ticker: "TEST",
+                price: 2.00
+            });
+            
+            await t.save();
+
+            var f = new Stock({
+                company: "free",
+                ticker: "FREE",
+                price: 0.00
+            });
+
+            await f.save();
+        });
+
+        socket.on("change", (price) => {
+            Stock.findOne({ ticker: "TEST" }, (err, doc) => {
+                doc.price = price;
+                doc.save();
+            })
+        })
     });   
 }
