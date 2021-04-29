@@ -28,6 +28,7 @@ ___
 - NodeJS (^15.11.0)
 - yarn (or npm, etc.)
 - MongoDB Instance (I used a free Atlas cluster)
+- docker
 
 ### Download
 Either download the source code from the repo or clone it locally using `git clone`
@@ -46,6 +47,40 @@ Either using yarn or npm
 ### Run
 
     yarn run start
+
+### Deployment
+
+#### Build docker image
+Enter the repo locally (if you haven't already)  
+    cd LeapGrad-challenge-main/  
+
+Docker build
+
+    docker build --tag leapgrad-challenge .
+
+Run the container or deploy to the cloud.  
+
+    docker run -d -p 80:3000 leapgrad-challenge
+
+Access the server from the browser at   
+
+    http://localhost
+
+or the address of your cloud deployment
+
+### Testing
+
+Enter the repo locally (if you haven't already)  
+    cd LeapGrad-challenge-main/
+
+Install dependencies, including dev dependencies (mocha/chai)
+
+    yarn install
+
+Run tests
+
+    yarn run test
+
 
 ### Endpoints
 
@@ -341,7 +376,3 @@ The client can emit the "update" event with a callback function:
     function (arr) {
         console.log(arr); // print array of stocks with information to console
     }
-
-### Test
-
-    yarn run test
