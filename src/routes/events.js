@@ -22,11 +22,16 @@ export default function(io) {
 
     io.sockets.on('connection', (socket) => {
         console.log("connected!!");
-        // listen for changed event
-        // emit updated doc to socket
-        Stock.schema.on("changed", (doc) => {
-            socket.emit("update one", doc);
-        })       
+        // Set changeStream to watch Stock collection in db
+        // emit updated new Stock to socket
+        const stockEventEmitter = Stock.watch();
+        stockEventEmitter.on('change', (change) => {
+            var id_ = change.documentKey._id;
+            Stock.findById(id_, { _id: false, __v: false}, (err, stock) => {
+                if (err) throw err;
+                socket.emit("update one", stock);
+            });
+        }); 
 
         socket.on("update", async (cb) => {
             var arr = await getAllStocks();
