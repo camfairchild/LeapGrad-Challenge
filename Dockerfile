@@ -1,11 +1,11 @@
-FROM node:12.18.1
+FROM node:15.12.0
 ENV NODE_ENV=production
 
 WORKDIR /app
 
 COPY ["package.json", "package-lock.json*", "./"]
 
-RUN npm install --production
+RUN yarn install --production
 
 COPY . .
 
