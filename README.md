@@ -44,6 +44,14 @@ Either using yarn or npm
 
     yarn install
 
+#### Secrets
+You will have to create and fill-in the `.env` file with your secrets as follows:  
+
+    MONGO_URI_prod=<mongodb_uri for production db>
+    MONGO_URI_test=<mongodb_uri for testing db>
+    JWT_SECRET=<some super secret pass phrase for JWT>
+
+
 ### Run
 
     yarn run start
