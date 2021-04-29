@@ -7,9 +7,4 @@ const StockSchema = new Schema({
         price: { type: Number, required: true }
 });
 
-StockSchema.post('save', (doc, next) =>{
-        StockSchema.emit('saved', doc);
-        next();
-});
-
 export default mongoose.model('Stock', StockSchema);

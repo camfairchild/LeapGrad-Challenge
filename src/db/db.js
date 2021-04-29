@@ -15,6 +15,17 @@ export function connect(uri) {
             useUnifiedTopology: true
         }
     );
+
+    // Set changeStream to watch Stock collection in db
+    const stockEventEmitter = Stock.watch();
+    stockEventEmitter.on('change', (change) => {
+        var id_ = change.documentKey._id;
+        Stock.findById(id_, { _id: false, __v: false}, (err, stock) => {
+            if (err) throw err;
+            Stock.schema.emit('changed', stock);
+        });
+    });
+
     return mongoose.connection;
 }
 
