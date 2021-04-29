@@ -52,6 +52,7 @@ Either using yarn or npm
 
 #### Build docker image
 Enter the repo locally (if you haven't already)  
+
     cd LeapGrad-challenge-main/  
 
 Docker build
@@ -71,6 +72,7 @@ or the address of your cloud deployment
 ### Testing
 
 Enter the repo locally (if you haven't already)  
+
     cd LeapGrad-challenge-main/
 
 Install dependencies, including dev dependencies (mocha/chai)
